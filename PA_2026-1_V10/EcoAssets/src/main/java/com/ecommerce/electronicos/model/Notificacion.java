@@ -5,11 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-/**
- * Aviso para el vendedor de que uno de sus productos fue comprado (US-04).
- * Guarda una copia de los datos del producto y del comprador al momento de la venta,
- * así el aviso no cambia si luego se edita o elimina la publicación.
- */
+
 @Document(collection = "notificacion")
 public class Notificacion {
 
