@@ -23,6 +23,7 @@ public class CompraController {
     @Autowired private PedidoService pedidoService;
     @Autowired private UsuarioService usuarioService;
     @Autowired private DispositivoService dispositivoService;
+    @Autowired private FacturaEmailService facturaEmailService;
 
     @GetMapping("/procesar")
 public String procesarCompra(Authentication auth, RedirectAttributes ra) {
@@ -48,14 +49,16 @@ public String procesarCompra(Authentication auth, RedirectAttributes ra) {
         }
 
         // 3. Persistencia
-        pedidoService.guardarPedido(pedido);
+        Pedido guardado = pedidoService.guardarPedido(pedido);
         
         // 4. Limpiar carrito y actualizar usuario
         usuario.getCarrito().clear();
         usuarioService.actualizarUsuario(usuario);
 
-        ra.addFlashAttribute("mensaje", "¡Compra realizada con éxito!");
-        
+        // 5. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
+        facturaEmailService.enviarFacturaAsync(guardado.getId());
+        ra.addFlashAttribute("mensaje", "¡Compra realizada con éxito! Esta es tu factura.");
+        return "redirect:/facturas/" + guardado.getId();
 
     } catch (Exception e) {
         // Esto evitará el error 500 y te mostrará qué pasó en la consola
@@ -63,7 +66,6 @@ public String procesarCompra(Authentication auth, RedirectAttributes ra) {
         ra.addFlashAttribute("error", "Error al procesar la compra: " + e.getMessage());
         return "redirect:/carrito";
     }
-        return "redirect:/dispositivos";
     }
 
     @PostMapping("/rapida")
@@ -103,10 +105,12 @@ public String compraRapida(@RequestParam String dispositivoId, Authentication au
         dispositivoService.actualizarDispositivo(disp);
 
         // 3. Guardar pedido
-        pedidoService.guardarPedido(pedido);
+        Pedido guardado = pedidoService.guardarPedido(pedido);
 
-        ra.addFlashAttribute("mensaje", "¡Compra rápida realizada con éxito!");
-        return "redirect:/usuarios/mi-perfil";
+        // 4. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
+        facturaEmailService.enviarFacturaAsync(guardado.getId());
+        ra.addFlashAttribute("mensaje", "¡Compra rápida realizada con éxito! Esta es tu factura.");
+        return "redirect:/facturas/" + guardado.getId();
 
     } catch (Exception e) {
         e.printStackTrace();
