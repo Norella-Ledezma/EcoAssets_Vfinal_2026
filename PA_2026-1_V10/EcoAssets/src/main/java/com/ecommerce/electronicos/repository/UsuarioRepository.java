@@ -20,6 +20,8 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
  
     boolean existsByEmail(String email);
  
+    long countByTipo(TipoUsuario tipo);
+
     List<Usuario> findByTipo(TipoUsuario tipo);
  
     default List<Usuario> findUsuariosNormales() {
