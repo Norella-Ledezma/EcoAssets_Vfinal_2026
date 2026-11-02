@@ -24,6 +24,7 @@ public class CompraController {
     @Autowired private UsuarioService usuarioService;
     @Autowired private DispositivoService dispositivoService;
     @Autowired private FacturaEmailService facturaEmailService;
+    @Autowired private NotificacionService notificacionService;
 
     @GetMapping("/procesar")
 public String procesarCompra(Authentication auth, RedirectAttributes ra) {
@@ -57,6 +58,8 @@ public String procesarCompra(Authentication auth, RedirectAttributes ra) {
 
         // 5. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
         facturaEmailService.enviarFacturaAsync(guardado.getId());
+        // 6. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
+        notificacionService.notificarVentaAsync(guardado.getId());
         ra.addFlashAttribute("mensaje", "¡Compra realizada con éxito! Esta es tu factura.");
         return "redirect:/facturas/" + guardado.getId();
 
@@ -109,6 +112,8 @@ public String compraRapida(@RequestParam String dispositivoId, Authentication au
 
         // 4. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
         facturaEmailService.enviarFacturaAsync(guardado.getId());
+        // 6. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
+        notificacionService.notificarVentaAsync(guardado.getId());
         ra.addFlashAttribute("mensaje", "¡Compra rápida realizada con éxito! Esta es tu factura.");
         return "redirect:/facturas/" + guardado.getId();
 
