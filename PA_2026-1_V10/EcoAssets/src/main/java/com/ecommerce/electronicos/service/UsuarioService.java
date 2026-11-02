@@ -26,6 +26,10 @@ public class UsuarioService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public long contarPorTipo(TipoUsuario tipo) {
+    return usuarioRepository.countByTipo(tipo);
+    }
     
     public UsuarioService(UsuarioRepository usuarioRepository, DispositivoRepository dispositivoRepository) {
         this.usuarioRepository = usuarioRepository;
