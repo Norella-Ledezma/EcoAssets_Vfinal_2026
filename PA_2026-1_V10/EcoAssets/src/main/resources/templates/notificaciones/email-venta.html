@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendiste un producto en EcoAssets</title>
+</head>
+<body style="margin:0;padding:24px 12px;background:#ebebeb;font-family:Arial,Helvetica,sans-serif;color:#333333;">
+    <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
+        <div style="background:#ff5500;padding:16px 24px;color:#ffffff;font-size:20px;font-weight:bold;">
+            EcoAssets · ¡Tienes una venta!
+        </div>
+        <div style="padding:24px;font-size:15px;line-height:1.5;">
+            <p>Hola <strong th:text="${vendedor.nombre}">vendedor</strong>, ¡buenas noticias! Alguien compró uno de tus productos:</p>
+
+            <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+                <tr>
+                    <td style="padding:6px 0;color:#777777;width:38%;">Producto</td>
+                    <td style="padding:6px 0;"><strong th:text="${n.productoNombre}">Producto</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0;color:#777777;">Marca / modelo</td>
+                    <td style="padding:6px 0;" th:text="${n.productoMarcaModelo}">Marca Modelo</td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0;color:#777777;">Precio</td>
+                    <td style="padding:6px 0;">$<span th:text="${n.precioFormateado}">0</span></td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0;color:#777777;">Fecha de la venta</td>
+                    <td style="padding:6px 0;">
+                        <span th:text="${#temporals.format(n.fechaVenta, 'dd/MM/yyyy')}">01/01/2026</span>
+                        <span th:text="${#temporals.format(n.fechaVenta, 'HH:mm')}">12:00</span>
+                    </td>
+                </tr>
+            </table>
+
+            <p style="margin:20px 0 6px 0;font-weight:bold;">Datos del cliente para coordinar la entrega</p>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <tr>
+                    <td style="padding:6px 0;color:#777777;width:38%;">Nombre</td>
+                    <td style="padding:6px 0;" th:text="${n.compradorNombre}">Cliente</td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0;color:#777777;">Correo</td>
+                    <td style="padding:6px 0;" th:text="${n.compradorEmail}">correo@ejemplo.com</td>
+                </tr>
+                <tr th:if="${n.compradorTelefono != null and !#strings.isEmpty(n.compradorTelefono)}">
+                    <td style="padding:6px 0;color:#777777;">Teléfono</td>
+                    <td style="padding:6px 0;" th:text="${n.compradorTelefono}">3000000000</td>
+                </tr>
+            </table>
+
+            <p style="margin:28px 0 0 0;text-align:center;">
+                <a th:href="${urlNotificaciones}" href="#"
+                   style="background:#3483fa;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:6px;font-weight:bold;">
+                    Ver mis notificaciones
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

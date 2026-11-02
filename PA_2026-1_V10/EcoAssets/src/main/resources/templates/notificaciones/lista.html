@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Mis notificaciones')}"></head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container mt-5 mb-5" style="max-width: 860px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-bell"></i> Mis notificaciones
+                <span class="badge bg-danger ms-2" th:if="${noLeidas > 0}" th:text="${noLeidas}">0</span>
+            </h3>
+            <form th:action="@{/notificaciones/leer-todas}" method="post" th:if="${noLeidas > 0}" class="m-0">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-check2-all"></i> Marcar todas como leídas
+                </button>
+            </form>
+        </div>
+
+        <div class="alert alert-light text-center shadow-sm" th:if="${#lists.isEmpty(notificaciones)}">
+            <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
+            Aún no tienes ventas. Cuando alguien compre uno de tus productos te avisaremos aquí y por correo.
+        </div>
+
+        <div class="card shadow-sm mb-3" th:each="n : ${notificaciones}"
+             th:classappend="${!n.leida} ? 'border-start border-4 border-warning'">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="bi bi-bag-check text-success"></i>
+                            ¡Vendiste <strong th:text="${n.productoNombre}">Producto</strong>!
+                            <span class="badge bg-warning text-dark ms-1" th:if="${!n.leida}">Nuevo</span>
+                        </h5>
+                        <p class="text-muted mb-2" th:text="${n.productoMarcaModelo}">Marca Modelo</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-5 fw-semibold">$<span th:text="${n.precioFormateado}">0</span></div>
+                        <small class="text-muted">
+                            <span th:text="${#temporals.format(n.fechaVenta, 'dd/MM/yyyy')}">01/01/2026</span>
+                            <span th:text="${#temporals.format(n.fechaVenta, 'HH:mm')}">12:00</span>
+                        </small>
+                    </div>
+                </div>
+
+                <hr class="my-2">
+                <div class="small">
+                    <div class="fw-semibold mb-1">Datos del cliente</div>
+                    <div><i class="bi bi-person"></i> <span th:text="${n.compradorNombre}">Cliente</span></div>
+                    <div><i class="bi bi-envelope"></i>
+                        <a th:href="'mailto:' + ${n.compradorEmail}" th:text="${n.compradorEmail}">correo</a></div>
+                    <div th:if="${n.compradorTelefono != null and !#strings.isEmpty(n.compradorTelefono)}">
+                        <i class="bi bi-telephone"></i> <span th:text="${n.compradorTelefono}">teléfono</span></div>
+                </div>
+
+                <form th:action="@{/notificaciones/{id}/leida(id=${n.id})}" method="post" th:if="${!n.leida}" class="mt-3 mb-0">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-check2"></i> Marcar como leída
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
