@@ -76,6 +76,3 @@ public class CarritoController {
         return "redirect:/carrito";
     }
 }
-
-    }
-}
