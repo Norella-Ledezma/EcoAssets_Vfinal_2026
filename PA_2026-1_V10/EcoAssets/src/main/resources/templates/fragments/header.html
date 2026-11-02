@@ -101,9 +101,6 @@
                 </form>
                 
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/dispositivos"><i class="bi bi-shop"></i> Tienda</a>
-                    </li>
                     
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                         <a class="nav-link text-white" href="/admin/panel">
@@ -150,6 +147,16 @@
                     </li>
                     </ul>
             </div>
+        </div>
+    </nav>
+          <nav class="navbar navbar-custom" th:fragment="navbarBasico">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/dispositivos}">
+                <img src="https://i.ibb.co/Hy9mb6G/ecoassets-transparente-borde.png" alt="Eco Assets3 full" class="logo" style="height: 80px;">
+            </a>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/dispositivos}">
+                <i class="bi bi-arrow-left"></i> Volver a la tienda
+            </a>
         </div>
     </nav>
     
