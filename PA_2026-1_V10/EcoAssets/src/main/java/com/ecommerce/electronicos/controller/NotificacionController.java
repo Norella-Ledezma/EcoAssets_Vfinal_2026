@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
-/** Notificaciones de venta del vendedor autenticado (US-04). */
 @Controller
 @RequestMapping("/notificaciones")
 public class NotificacionController {
