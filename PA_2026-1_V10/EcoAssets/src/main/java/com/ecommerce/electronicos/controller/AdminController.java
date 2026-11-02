@@ -8,28 +8,25 @@ import com.ecommerce.electronicos.service.UsuarioService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import org.springframework.data.domain.Sort;
-
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    
+
     private final UsuarioService usuarioService;
     private final DispositivoService dispositivoService;
-    
-    
-    public AdminController(UsuarioService usuarioService, 
-                          DispositivoService dispositivoService) {
+
+    public AdminController(UsuarioService usuarioService,
+                           DispositivoService dispositivoService) {
         this.usuarioService = usuarioService;
         this.dispositivoService = dispositivoService;
-        
     }
-    
+
     // 1. Método para mostrar el formulario de registro adaptado para Admin
     @GetMapping("/usuarios/nuevo")
     public String mostrarFormularioAdmin(Model model) {
@@ -45,18 +42,18 @@ public class AdminController {
         try {
             // Forzamos que el tipo sea Administrador por seguridad, sin importar lo que venga del formulario
             usuario.setTipo(TipoUsuario.ADMINISTRADOR);
-            
+
             // Usamos tu servicio para encriptar y guardar
-            usuarioService.crearUsuario(usuario); 
-            
+            usuarioService.crearUsuario(usuario);
+
             redirectAttributes.addFlashAttribute("mensaje", "Administrador creado exitosamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al crear el administrador: " + e.getMessage());
         }
-        
+
         return "redirect:/admin/panel";
-    }    
-    
+    }
+
     @GetMapping("/dispositivos/eliminar/{id}")
     public String eliminarDispositivo(@PathVariable String id) {
         dispositivoService.eliminarDispositivo(id);
@@ -78,11 +75,14 @@ public class AdminController {
         model.addAttribute("usuariosPage", pageUsuarios);
         model.addAttribute("dispositivosPage", pageDispositivos);
 
-        // Estadísticas — usando count directo para no cargar todos los datos
-        model.addAttribute("totalUsuarios", usuarioService.obtenerTodos().size());
-        model.addAttribute("totalDispositivos", dispositivoService.obtenerTodos().size());
-        model.addAttribute("totalNormales", usuarioService.obtenerUsuariosNormales().size());
-        model.addAttribute("totalAdmins", usuarioService.obtenerAdministradores().size());
+        // Estadísticas: totales tomados de la paginación y conteo directo en BD
+        long totalUsuarios = pageUsuarios.getTotalElements();
+        long totalAdmins = usuarioService.contarPorTipo(TipoUsuario.ADMINISTRADOR);
+
+        model.addAttribute("totalUsuarios", totalUsuarios);
+        model.addAttribute("totalDispositivos", pageDispositivos.getTotalElements());
+        model.addAttribute("totalAdmins", totalAdmins);
+        model.addAttribute("totalNormales", totalUsuarios - totalAdmins);
 
         return "admin/panel";
     }
