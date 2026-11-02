@@ -63,6 +63,16 @@ public String listarDispositivos(
     model.addAttribute("ordenSeleccionado", ordenPrecio);
     model.addAttribute("busqueda", busqueda);
 
+    // Cuántos filtros del panel lateral están activos (para el contador del botón "Filtros")
+    int filtrosActivos = 0;
+    if (marca != null && !marca.isBlank()) filtrosActivos++;
+    if (precioMin != null) filtrosActivos++;
+    if (precioMax != null) filtrosActivos++;
+    if (departamento != null && !departamento.isBlank()) filtrosActivos++;
+    if (municipio != null && !municipio.isBlank()) filtrosActivos++;
+    if (ordenPrecio != null && !ordenPrecio.isBlank()) filtrosActivos++;
+    model.addAttribute("filtrosActivos", filtrosActivos);
+
     return "dispositivos/lista";
 }
 
