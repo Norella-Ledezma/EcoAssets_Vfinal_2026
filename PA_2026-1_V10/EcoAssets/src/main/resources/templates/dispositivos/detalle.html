@@ -24,6 +24,7 @@
                 <p><strong>Marca:</strong> <span th:text="${dispositivo.marca}"></span></p>
                 <p><strong>Modelo:</strong> <span th:text="${dispositivo.modelo}"></span></p>
                 <p><strong>Ubicación:</strong> <span th:text="${dispositivo.municipio} + ', ' + ${dispositivo.departamento}"></span></p>
+                <p><strong>unidades:</strong><span th:text="${dispositivo.stock} + (${dispositivo.stock == 1} ? ' solo hay una disponible' : ' disponibles')">1 unidad disponible</span></p>  
                 
                 <h5 class="mt-4 border-bottom pb-2">Descripción</h5>
                 <p th:text="${dispositivo.descripcion}">Descripción completa del dispositivo...</p>
