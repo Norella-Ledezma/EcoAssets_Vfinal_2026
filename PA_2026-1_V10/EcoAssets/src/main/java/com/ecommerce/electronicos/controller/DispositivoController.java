@@ -22,9 +22,10 @@ public class DispositivoController {
     private final DispositivoService dispositivoService;
     private final UsuarioService usuarioService;
     
-    public DispositivoController(DispositivoService dispositivoService, UsuarioService usuarioService) {
+    public DispositivoController(DispositivoService dispositivoService, UsuarioService usuarioService, FotoService fotoservice) {
         this.dispositivoService = dispositivoService;
         this.usuarioService = usuarioService;
+        this.fotoservice = fotoservice;
     }
     
     @GetMapping({"","/"})
