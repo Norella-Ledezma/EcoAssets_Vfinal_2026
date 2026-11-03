@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/facturas")
+@RequestMapping("/factura")
 public class FacturaController {
 
     private final PedidoService pedidoService;
@@ -58,7 +58,7 @@ public class FacturaController {
         } else {
             ra.addFlashAttribute("error", "No pudimos enviar el correo en este momento. Intenta de nuevo más tarde.");
         }
-        return "redirect:/facturas/" + id;
+        return "redirect:/factura/" + id;
     }
 
     private boolean puedeVer(Pedido pedido, Authentication auth) {
