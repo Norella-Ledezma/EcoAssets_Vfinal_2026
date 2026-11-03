@@ -300,6 +300,10 @@
                         <p class="text-muted small mb-2" th:text="${disp.marca} + ' ' + ${disp.modelo}">Marca Modelo</p>
                         
                         <div class="price-tag" th:text="'$ ' + ${disp.precioFormateado}">$ 0.00</div>
+
+                          <small class="text-muted d-block mt-1">
+                            <i class="bi bi-box-seam"></i> cantidad en venta: <strong th:text="${disp.stock}">1</strong>
+                        </small>
                         
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <small class="text-muted">
