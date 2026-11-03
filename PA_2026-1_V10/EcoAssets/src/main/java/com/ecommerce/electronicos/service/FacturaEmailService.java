@@ -43,7 +43,7 @@ public class FacturaEmailService {
 
         Context ctx = new Context(Locale.forLanguageTag("es-CO"));
         ctx.setVariable("pedido", pedido);
-        ctx.setVariable("urlFactura", urlBase() + "/facturas/" + pedido.getId());
+        ctx.setVariable("urlFactura", urlBase() + "/factura/" + pedido.getId());
 
         String html = templateEngine.process("factura/email", ctx);
         String asunto = "Tu factura " + pedido.getNumeroFactura() + " - EcoAssets";
