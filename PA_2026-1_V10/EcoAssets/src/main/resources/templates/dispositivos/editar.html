@@ -18,7 +18,7 @@
                         <!-- Formulario de edición -->
                         
                         <form th:action="@{/dispositivos/editar/{id}(id=${dispositivo.id})}"
-                              th:object="${dispositivo}" method="post">
+                              th:object="${dispositivo}" method="post" enctype="multipart/form-data">
  
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Nombre del producto *</label>
@@ -73,6 +73,13 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label fw-bold">Cantidad disponible: *</label>
+                                <input type="number" class="form-control" name="stock"
+                                       th:value="${dispositivo.stock}" min="1" max="999" step="1" required>
+                                <div class="form-text">¿Cuántas unidades tienes para vender?</div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="departamento" class="form-label">Departamento</label>
                                 <select class="form-select" id="departamento" th:field="*{departamento}" required>
                                     <option value="" selected>Selecciona un departamento...</option>
@@ -95,12 +102,34 @@
                                           rows="3" placeholder="Describe el estado y características del producto"></textarea>
                             </div>
  
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">URL de imagen</label>
-                                <input type="url" class="form-control" th:field="*{imagenUrl}"
-                                       placeholder="https://ejemplo.com/imagen.jpg">
-                                <div class="form-text">Deja en blanco para usar imagen por defecto</div>
+                           <div class="mb-4">
+                                <label class="form-label fw-bold">Foto del producto</label>
+
+                                <!-- foto actual del producto -->
+                                <div class="mb-2" th:if="${dispositivo.imagenUrl != null and !#strings.isEmpty(dispositivo.imagenUrl)}">
+                                    <div class="form-text mb-1">Foto actual:</div>
+                                    <img th:src="${dispositivo.imagenUrl}" class="img-thumbnail" style="max-height:150px;" alt="Foto actual">
+                                </div>
+
+                                <input type="file" class="form-control" name="foto"
+                                       accept="image/jpeg,image/png,image/webp" id="inputFoto">
+                                <div class="form-text">esto es opcional si no quieres cambiar la foto.</div>
+
+                                <!-- vista previa de la nueva foto cambiada-->
+                                <img id="preview" class="img-thumbnail mt-2 d-none" style="max-height:150px;" alt="Vista previa">
                             </div>
+                            <script>
+                                document.getElementById('inputFoto').addEventListener('change', e => {
+                                    const f = e.target.files[0];
+                                    const img = document.getElementById('preview');
+                                    if (f) {
+                                        img.src = URL.createObjectURL(f);
+                                        img.classList.remove('d-none');
+                                    } else {
+                                        img.classList.add('d-none');
+                                    }
+                                });
+                            </script>
  
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-warning flex-grow-1">
