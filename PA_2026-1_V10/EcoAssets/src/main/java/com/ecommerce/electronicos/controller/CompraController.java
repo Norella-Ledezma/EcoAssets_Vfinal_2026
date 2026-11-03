@@ -37,28 +37,38 @@ public String procesarCompra(Authentication auth, RedirectAttributes ra) {
             return "redirect:/carrito";
         }
 
+        //generar el pedido y quitarle el stock al dispositivo que fue seleccionado
+        List<Dispositivo> prosesado = new ArrayList<>();
+        for (Dispositivo d : new ArrayList<>(usuario.getCarrito())) {
+            if (dispositivoService.quitarstock(d.getId(), 1)) {
+                prosesado.add(d);
+            }
+        }
+
+        // Si no hay stock no se crea
+        if (prosesado.isEmpty()) {
+            usuario.getCarrito().clear();
+            usuarioService.actualizarUsuario(usuario);
+            ra.addFlashAttribute("error", "Los productos de tu carrito ya no tienen stock.");
+            return "redirect:/carrito";
+        } 
+
         // 1. Crear el Pedido
         Pedido pedido = new Pedido();
         pedido.setComprador(usuario);
         pedido.setProductos(new ArrayList<>(usuario.getCarrito()));
         pedido.setTotal(carritoService.obtenerTotal());
-        
-        // 2. Lógica de inventario: Marcar como vendidos
-        for (Dispositivo d : usuario.getCarrito()) {
-            d.setDisponible(false);
-            dispositivoService.actualizarDispositivo(d); 
-        }
 
-        // 3. Persistencia
+        // 2. Persistencia
         Pedido guardado = pedidoService.guardarPedido(pedido);
         
-        // 4. Limpiar carrito y actualizar usuario
+        // 3. Limpiar carrito y actualizar usuario
         usuario.getCarrito().clear();
         usuarioService.actualizarUsuario(usuario);
 
-        // 5. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
+        // 4. Factura: enviarla al correo (en segundo plano) y mostrarla en la web
         facturaEmailService.enviarFacturaAsync(guardado.getId());
-        // 6. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
+        // 5. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
         notificacionService.notificarVentaAsync(guardado.getId());
         ra.addFlashAttribute("mensaje", "¡Compra realizada con éxito! Esta es tu factura.");
         return "redirect:/facturas/" + guardado.getId();
