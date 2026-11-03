@@ -1,0 +1,19 @@
+@relation ventas_mensuales
+
+@attribute categoria {Accesorios,Audio,Consolas,Laptops,Otros,Smartphones,Tablets,Televisores}
+@attribute log_ventas_lag1 numeric
+@attribute log_activas_inicio numeric
+@attribute log_nuevas_lag1 numeric
+@attribute log_vendedores_lag1 numeric
+@attribute log_precio_prom_lag1 numeric
+@attribute prop_reac_lag1 numeric
+@attribute festivos_mes numeric
+@attribute es_prima numeric
+@attribute es_navidad numeric
+@attribute es_black_friday numeric
+@attribute es_regreso_clases numeric
+@attribute es_dia_madre numeric
+@attribute es_dia_padre numeric
+@attribute log_ventas numeric
+
+@data
