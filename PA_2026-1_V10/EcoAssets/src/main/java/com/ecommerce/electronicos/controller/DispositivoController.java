@@ -98,9 +98,10 @@ public String mostrarFormulario(Model model) {
 }
     
     @PostMapping("/guardar")
-    public String guardarDispositivo(@ModelAttribute Dispositivo dispositivo, 
-                                  Authentication authentication,
-                                  RedirectAttributes redirectAttributes) {
+    public String guardarDispositivo(@ModelAttribute Dispositivo dispositivo,
+                                     @RequestParam(value = "foto", required = false) MultipartFile foto,
+                                    Authentication authentication,
+                                    RedirectAttributes redirectAttributes) {
     
         if (authentication == null) {
             return "redirect:/login";
@@ -111,6 +112,24 @@ public String mostrarFormulario(Model model) {
         Optional<Usuario> usuarioOpt = usuarioService.obtenerPorEmail(email);
         
         if (usuarioOpt.isPresent()) {
+            
+             //funcion para subir la foto y guardarla
+            try {
+                if (foto != null && !foto.isEmpty()) {
+                    dispositivo.setImagenUrl(fotoservice.subir(foto));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("error", "No se pudo subir la imagen: " + e.getMessage());
+                return "redirect:/dispositivos/nuevo";
+            }
+
+            //el minimo del stock para k sea valido
+            if(dispositivo.getStock() < 1){
+                dispositivo.setStock(1);
+            }
+            dispositivo.setDisponible(true);
+ 
             dispositivo.setVendedor(usuarioOpt.get());
             dispositivoService.crearDispositivo(dispositivo);
             redirectAttributes.addFlashAttribute("mensaje", "Producto publicado exitosamente");
@@ -153,6 +172,8 @@ public String mostrarFormulario(Model model) {
     @PostMapping("/editar/{id}")
     public String guardarEdicion(@PathVariable String id,
                                  @ModelAttribute Dispositivo dispositivoEditado,
+                                 @RequestParam(value = "stock",required = false) Integer stock,
+                                 @RequestParam(value = "foto", required = false) MultipartFile foto, 
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
         if (authentication == null) return "redirect:/login";
@@ -179,7 +200,27 @@ public String mostrarFormulario(Model model) {
         dispositivoEditado.setId(id);
         dispositivoEditado.setVendedor(original.getVendedor());
         dispositivoEditado.setFechaPublicacion(original.getFechaPublicacion());
+
+        // funcion para formulario lo envía sie el stock es >=1 se usa; si no, se mantiene el que ya tenía
+        if (stock != null && stock >= 1){
+            dispositivoEditado.setStock(stock);
+        }else{
+            dispositivoEditado.setStock(original.getStock());
+        }
+        dispositivoEditado.setDisponible(dispositivoEditado.getStock() > 0);
  
+        // foto nueva si se subio una, si no se conserva la actual
+        try {
+            if (foto != null && !foto.isEmpty()) {
+                dispositivoEditado.setImagenUrl(fotoservice.subir(foto));
+            } else {
+                dispositivoEditado.setImagenUrl(original.getImagenUrl());
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo subir la imagen: " + e.getMessage());
+            return "redirect:/dispositivos/editar/" + id;
+        }
+        
         dispositivoService.actualizarDispositivo(dispositivoEditado);
         redirectAttributes.addFlashAttribute("mensaje", "Producto actualizado correctamente");
         return "redirect:/dispositivos";
