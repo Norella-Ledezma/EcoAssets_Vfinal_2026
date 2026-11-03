@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Factura ' + ${pedido.numeroFactura})}"></head>
+<body>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #ffffff !important; }
+        }
+    </style>
+
+    <div class="no-print">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </div>
+
+    <div class="container mt-4 mb-5">
+
+        <!-- Mensajes -->
+        <div class="alert alert-success alert-dismissible fade show no-print" th:if="${mensaje}">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show no-print" th:if="${error}">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Acciones -->
+        <div class="d-flex flex-wrap gap-2 justify-content-center mb-4 no-print">
+            <a th:href="@{/usuarios/mi-perfil}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Mis compras
+            </a>
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> Imprimir / Guardar PDF
+            </button>
+            <form th:action="@{/facturas/{id}/enviar(id=${pedido.id})}" method="post" class="m-0">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Enviar a mi correo
+                </button>
+            </form>
+        </div>
+
+        <!-- La factura (plantilla compartida con el correo) -->
+        <div th:replace="~{factura/_cuerpo :: cuerpo(${pedido}, ${null})}"></div>
+
+    </div>
+
+    <div class="no-print">
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
+</body>
+</html>
