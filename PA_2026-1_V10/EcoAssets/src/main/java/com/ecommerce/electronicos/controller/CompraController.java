@@ -113,9 +113,11 @@ public String compraRapida(@RequestParam String dispositivoId, Authentication au
         pedido.setProductos(List.of(disp));
         pedido.setTotal(disp.getPrecio());
         
-        // 2. Marcar como vendido
-        disp.setDisponible(false);
-        dispositivoService.actualizarDispositivo(disp);
+        // 2. Marcar como vendido si y solo si el stock llega a 0
+        if (!dispositivoService.quitarstock(disp.getId(), 1)) {
+            ra.addFlashAttribute("error", "Lo sentimos, este producto ya no tiene stock.");
+            return "redirect:/dispositivos";
+        }
 
         // 3. Guardar pedido
         Pedido guardado = pedidoService.guardarPedido(pedido);
