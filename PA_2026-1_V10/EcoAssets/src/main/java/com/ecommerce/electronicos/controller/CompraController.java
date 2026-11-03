@@ -127,7 +127,7 @@ public String compraRapida(@RequestParam String dispositivoId, Authentication au
         // 6. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
         notificacionService.notificarVentaAsync(guardado.getId());
         ra.addFlashAttribute("mensaje", "¡Compra rápida realizada con éxito! Esta es tu factura.");
-        return "redirect:/facturas/" + guardado.getId();
+        return "redirect:/factura/" + guardado.getId();
 
     } catch (Exception e) {
         e.printStackTrace();
