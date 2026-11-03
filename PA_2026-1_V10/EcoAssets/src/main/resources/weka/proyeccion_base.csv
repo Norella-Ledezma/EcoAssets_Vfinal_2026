@@ -1,0 +1,9 @@
+categoria,mes,ventas_mes_anterior,publicaciones_activas_inicio,publicaciones_nuevas_mes_anterior,vendedores_activos_mes_anterior,precio_promedio_mes_anterior,proporcion_reacondicionados_mes_anterior,mes_del_anio,festivos_mes
+Accesorios,2026-11,3453000.0,166,36,122,108792.0,0.104,11,2
+Audio,2026-11,8248000.0,112,31,95,337329.0,0.1678,11,2
+Consolas,2026-11,18436000.0,66,17,69,1582855.0,0.1084,11,2
+Laptops,2026-11,46285000.0,151,31,105,2444071.0,0.3352,11,2
+Otros,2026-11,3994000.0,99,26,89,506104.0,0.2,11,2
+Smartphones,2026-11,29205000.0,231,50,132,1131456.0,0.363,11,2
+Tablets,2026-11,6242000.0,103,22,94,715008.0,0.28,11,2
+Televisores,2026-11,4594000.0,75,10,64,1344788.0,0.1294,11,2
