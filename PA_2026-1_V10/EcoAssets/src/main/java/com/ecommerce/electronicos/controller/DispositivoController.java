@@ -4,6 +4,7 @@ import com.ecommerce.electronicos.model.Dispositivo;
 import com.ecommerce.electronicos.model.Usuario;
 import com.ecommerce.electronicos.service.DispositivoService;
 import com.ecommerce.electronicos.service.UsuarioService;
+import com.ecommerce.electronicos.service.FotoService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -21,13 +22,16 @@ public class DispositivoController {
     
     private final DispositivoService dispositivoService;
     private final UsuarioService usuarioService;
-    
-    public DispositivoController(DispositivoService dispositivoService, UsuarioService usuarioService, FotoService fotoservice) {
+    private final FotoService fotoservice;
+
+    public DispositivoController(DispositivoService dispositivoService,
+                                 UsuarioService usuarioService,
+                                 FotoService fotoservice) {
         this.dispositivoService = dispositivoService;
         this.usuarioService = usuarioService;
         this.fotoservice = fotoservice;
     }
-    
+        
     @GetMapping({"","/"})
 public String listarDispositivos(
         @RequestParam(required = false) String busqueda,
