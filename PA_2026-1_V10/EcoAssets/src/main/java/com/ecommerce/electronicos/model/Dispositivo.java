@@ -49,6 +49,9 @@ public class Dispositivo {
 
     @Field("municipio")
     private String municipio;
+
+    @Field("stock")
+    private int stock = 1;
     
     public Dispositivo() {
         this.fechaPublicacion = LocalDateTime.now();
@@ -60,7 +63,7 @@ public class Dispositivo {
     public Dispositivo(String id, String nombre, String marca, String modelo, 
                        String descripcion, double precio, String categoria, 
                        String estado, String imagenUrl, Usuario vendedor,
-                       String departamento, String municipio, boolean disponible) {
+                       String departamento, String municipio,int stock, boolean disponible) {
         this();
         this.id = id;
         this.nombre = nombre;
@@ -75,6 +78,7 @@ public class Dispositivo {
         this.departamento = departamento;
         this.municipio = municipio;
         this.disponible = disponible;
+        this.stock = stock;
     }
     
     // Getters y Setters
@@ -133,6 +137,12 @@ public class Dispositivo {
 
     public boolean isDisponible() {
         return disponible;
+    }
+    public int getStock() {
+        return stock;
+    }
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public void setDisponible(boolean disponible) {
