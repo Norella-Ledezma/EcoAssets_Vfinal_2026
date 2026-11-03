@@ -138,15 +138,18 @@ public class Dispositivo {
     public boolean isDisponible() {
         return disponible;
     }
+    
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
+
     public int getStock() {
         return stock;
     }
+    
     public void setStock(int stock) {
         this.stock = stock;
     }
 
-    public void setDisponible(boolean disponible) {
-        this.disponible = disponible;
-    }
     
 }
