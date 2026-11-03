@@ -135,6 +135,22 @@ public Page<Dispositivo> buscarDispositivosConFiltros(
     return new org.springframework.data.domain.PageImpl<>(dispositivos, pageable, total);
 }
 
+    //funcion para quitar el stock cuando el comprador haya comprado un dispositivo
+    public synchronized boolean quitarstock(String id, int cantidad){
+        Optional<Dispositivo> opt = dispositivoRepository.findById(id);
+        if (opt.isEmpty()) return false;
+        //devuelve a false si no se alcanzan las cantidades
+        Dispositivo d = opt.get();
+        if(!d.isDisponible()|| d.getStock() < cantidad) return false;
+        //si el stock llega a 0 el producto queda como no disponible
+        d.setStock(d.getStock()-cantidad);
+        if(d.getStock() <= 0){
+            d.setDisponible (false);
+        }
+        dispositivoRepository.save(d);
+        return true;
+    }
+
     public List<Dispositivo> obtenerTodosDisponibles() {
         return dispositivoRepository.findByDisponibleTrue();
     }
