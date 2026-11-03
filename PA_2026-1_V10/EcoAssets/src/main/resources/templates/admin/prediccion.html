@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/header :: head('Predicción de ventas')}"></head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container mt-4 mb-5">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold m-0"><i class="bi bi-graph-up-arrow"></i> Predicción de ventas</h2>
+            <a th:href="@{/admin/panel}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Volver al panel</a>
+        </div>
+
+        <div class="alert alert-warning" th:if="${!modeloDisponible}">
+            El modelo de predicción no se pudo cargar. Revisa que existan los archivos <code>weka/ventas_modelo.model</code>
+            y <code>weka/ventas_estructura.arff</code> en <code>src/main/resources</code> y mira el log del servidor.
+        </div>
+
+        <div class="alert alert-info small" th:if="${modeloDisponible}">
+            <i class="bi bi-info-circle"></i>
+            Modelo entrenado con datos <strong th:text="${resumen.origen}">simulado</strong>s (demostración académica).
+            Las cifras muestran cómo funciona el procedimiento, no la demanda real del mercado.
+        </div>
+
+        <!-- ================= Proyección automática ================= -->
+        <div class="card shadow-sm mb-4" th:if="${modeloDisponible}">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart-line"></i> Ventas proyectadas por categoría
+                    <span class="badge bg-primary ms-2" th:text="'Mes ' + ${mesProyeccion}">Mes</span>
+                </h5>
+                <div class="row">
+                    <div class="col-lg-6 mb-3">
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr><th>Categoría</th><th class="text-end">Ventas estimadas (COP)</th><th class="text-end">Rango aproximado</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="p : ${proyeccion}">
+                                        <td th:text="${p.categoria}">Categoría</td>
+                                        <td class="text-end fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(p.prediccionCop, 1, 'COMMA', 0, 'POINT')}">$ 0</td>
+                                        <td class="text-end text-muted small"
+                                            th:text="${#numbers.formatDecimal(p.rangoMinCop / 1000000, 1, 'COMMA', 1, 'POINT')} + ' M - ' + ${#numbers.formatDecimal(p.rangoMaxCop / 1000000, 1, 'COMMA', 1, 'POINT')} + ' M'">0 - 0</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(proyeccion)}">
+                                        <td colspan="3" class="text-center text-muted">Sin datos de proyección.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <canvas id="graficoProyeccion" height="230"></canvas>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">El rango se calcula con el error que tuvo el modelo en su periodo de prueba; es una referencia, no una garantía.</p>
+            </div>
+        </div>
+
+        <!-- ================= Predicción manual ================= -->
+        <div class="card shadow-sm mb-4" th:if="${modeloDisponible}">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calculator"></i> Predecir ventas de un mes</h5>
+                <p class="text-muted small">Elige una categoría para cargar sus últimos valores y cámbialos para simular escenarios.</p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Categoría</label>
+                        <select id="categoria" class="form-select">
+                            <option th:each="c : ${categorias}" th:value="${c}" th:text="${c}">Categoría</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Mes a predecir</label>
+                        <select id="mesDelAnio" class="form-select">
+                            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+                            <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+                            <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+                            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Festivos del mes <span class="text-muted small">(opcional)</span></label>
+                        <input id="festivosMes" type="number" min="0" max="10" class="form-control" placeholder="Valor típico del mes">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ventas del mes anterior (COP)</label>
+                        <input id="ventasMesAnterior" type="number" min="0" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Publicaciones activas el día 1</label>
+                        <input id="publicacionesActivasInicio" type="number" min="0" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Publicaciones nuevas (mes anterior)</label>
+                        <input id="publicacionesNuevasMesAnterior" type="number" min="0" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Vendedores activos (mes anterior)</label>
+                        <input id="vendedoresActivosMesAnterior" type="number" min="0" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Precio promedio (mes anterior, COP)</label>
+                        <input id="precioPromedioMesAnterior" type="number" min="0" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Proporción de reacondicionados (0 a 1)</label>
+                        <input id="proporcionReacondicionadosMesAnterior" type="number" min="0" max="1" step="0.01" class="form-control">
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="button" id="btnPredecir" class="btn btn-primary"><i class="bi bi-lightning-charge"></i> Predecir</button>
+                </div>
+
+                <div id="resultado" class="alert alert-success mt-3 d-none"></div>
+                <div id="errorPrediccion" class="alert alert-danger mt-3 d-none"></div>
+            </div>
+        </div>
+
+        <!-- ================= Historial ================= -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-clock-history"></i> Historial de predicciones</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle" id="tablaHistorial">
+                        <thead>
+                            <tr><th>Fecha</th><th>Administrador</th><th>Categoría</th><th>Mes</th><th class="text-end">Predicción (COP)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="h : ${historial}">
+                                <td th:text="${#temporals.format(h.fecha, 'dd/MM/yyyy HH:mm')}">fecha</td>
+                                <td th:text="${h.usuario}">admin</td>
+                                <td th:text="${h.entrada?.categoria}">categoría</td>
+                                <td th:text="${h.entrada?.mesDelAnio}">mes</td>
+                                <td class="text-end fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(h.prediccionCop, 1, 'COMMA', 0, 'POINT')}">$ 0</td>
+                            </tr>
+                            <tr id="filaVacia" th:if="${#lists.isEmpty(historial)}">
+                                <td colspan="5" class="text-center text-muted">Todavía no hay predicciones guardadas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= Sobre el modelo ================= -->
+        <div class="card shadow-sm" th:if="${modeloDisponible}">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cpu"></i> Sobre el modelo</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Algoritmo:</strong> <span th:text="${resumen.modelo}">modelo</span></li>
+                            <li><strong>Versión de Weka:</strong> <span th:text="${resumen.wekaVersion}">3.9.6</span></li>
+                            <li><strong>Entrenado con:</strong> <span th:text="${resumen.entrenadoCon}">datos</span></li>
+                            <li><strong>Periodo de prueba:</strong> <span th:text="${resumen.prueba}">prueba</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th></th><th class="text-end">MAE (COP)</th><th class="text-end">R²</th></tr></thead>
+                            <tbody>
+                                <tr><td>Línea base (mes anterior)</td><td class="text-end" th:text="${resumen.baseMae}">0</td><td class="text-end" th:text="${resumen.baseR2}">0</td></tr>
+                                <tr class="table-success fw-bold"><td>Modelo de regresión</td><td class="text-end" th:text="${resumen.mae}">0</td><td class="text-end" th:text="${resumen.r2}">0</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="small text-muted mt-2 mb-0">El modelo reduce el error promedio en <strong th:text="${resumen.mejora}">0</strong> % frente a la línea base.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        const proyeccion = /*[[${proyeccion}]]*/ [];
+        const bases = /*[[${bases}]]*/ [];
+        const fmt = (n) => Math.round(n).toLocaleString('en-US');
+
+        // ---------- Gráfico de la proyección ----------
+        const lienzo = document.getElementById('graficoProyeccion');
+        if (lienzo && proyeccion.length) {
+            new Chart(lienzo, {
+                type: 'bar',
+                data: {
+                    labels: proyeccion.map(p => p.categoria),
+                    datasets: [{ label: 'Ventas estimadas (millones COP)',
+                                 data: proyeccion.map(p => p.prediccionCop / 1000000),
+                                 backgroundColor: '#ff7a00' }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // ---------- Autocompletar el formulario al elegir categoría ----------
+        const campos = ['ventasMesAnterior', 'publicacionesActivasInicio', 'publicacionesNuevasMesAnterior',
+                        'vendedoresActivosMesAnterior', 'precioPromedioMesAnterior', 'proporcionReacondicionadosMesAnterior'];
+        const selCategoria = document.getElementById('categoria');
+
+        function cargarBase() {
+            if (!selCategoria) return;
+            const b = bases.find(x => x.categoria === selCategoria.value);
+            if (!b) return;
+            campos.forEach(c => { document.getElementById(c).value = b[c]; });
+            document.getElementById('mesDelAnio').value = b.mesDelAnio;
+            document.getElementById('festivosMes').value = '';
+        }
+        if (selCategoria) { selCategoria.addEventListener('change', cargarBase); cargarBase(); }
+
+        // ---------- Enviar la predicción (POST /admin/prediccion/predecir) ----------
+        const btn = document.getElementById('btnPredecir');
+        if (btn) {
+            btn.addEventListener('click', async () => {
+                const ok = document.getElementById('resultado');
+                const err = document.getElementById('errorPrediccion');
+                ok.classList.add('d-none'); err.classList.add('d-none');
+
+                const datos = { categoria: selCategoria.value,
+                                mesDelAnio: parseInt(document.getElementById('mesDelAnio').value, 10) };
+                const festivos = document.getElementById('festivosMes').value;
+                datos.festivosMes = festivos === '' ? null : parseInt(festivos, 10);
+                campos.forEach(c => { datos[c] = parseFloat(document.getElementById(c).value || '0'); });
+
+                try {
+                    const resp = await fetch('/admin/prediccion/predecir', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos)
+                    });
+                    const json = await resp.json();
+                    if (!resp.ok) { err.textContent = json.error || 'No se pudo calcular la predicción.'; err.classList.remove('d-none'); return; }
+
+                    ok.innerHTML = '<strong>' + json.categoria + '</strong>: ventas estimadas de <strong>$ ' + fmt(json.prediccionCop) +
+                                   '</strong> COP<br><span class="small">Rango aproximado: $ ' + fmt(json.rangoMinCop) + ' a $ ' + fmt(json.rangoMaxCop) + '</span>';
+                    ok.classList.remove('d-none');
+
+                    // agrega la fila al historial sin recargar
+                    const vacia = document.getElementById('filaVacia'); if (vacia) vacia.remove();
+                    const fila = document.querySelector('#tablaHistorial tbody').insertRow(0);
+                    const ahora = new Date().toLocaleString('es-CO');
+                    [ahora, 'tú', json.categoria, json.mesDelAnio, '$ ' + fmt(json.prediccionCop)]
+                        .forEach((t, i) => { const c = fila.insertCell(); c.textContent = t; if (i === 4) c.className = 'text-end fw-bold'; });
+                } catch (e) {
+                    err.textContent = 'No se pudo conectar con el servidor.'; err.classList.remove('d-none');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
