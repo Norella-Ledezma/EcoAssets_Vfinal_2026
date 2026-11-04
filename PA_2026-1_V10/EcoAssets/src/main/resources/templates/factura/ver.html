@@ -33,11 +33,7 @@
             <button type="button" class="btn btn-outline-primary" onclick="window.print()">
                 <i class="bi bi-printer"></i> Imprimir / Guardar PDF
             </button>
-            <form th:action="@{/factura/{id}/enviar(id=${pedido.id})}" method="post" class="m-0">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-envelope"></i> Enviar a mi correo
-                </button>
-            </form>
+            
         </div>
 
         <!-- La factura (plantilla compartida con el correo) -->
