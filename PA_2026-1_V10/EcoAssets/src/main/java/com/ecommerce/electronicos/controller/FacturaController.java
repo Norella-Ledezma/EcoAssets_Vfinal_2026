@@ -52,7 +52,13 @@ public class FacturaController {
         }
 
         Pedido pedido = pedidoOpt.get();
-        boolean enviado = facturaEmailService.enviarFactura(pedido);
+        boolean enviado;
+        try {
+            enviado = facturaEmailService.enviarFactura(pedido);
+        } catch (Exception e) {
+            log.error("Fallo enviando factura {}", id, e);
+            enviado = false;
+        }
         if (enviado) {
             ra.addFlashAttribute("mensaje", "Te enviamos la factura a " + pedido.getComprador().getEmail() + ".");
         } else {
