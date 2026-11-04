@@ -12,14 +12,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
 
 @Controller
 @RequestMapping("/factura")
 public class FacturaController {
 
+    private static final Logger log = LoggerFactory.getLogger(FacturaController.class);
+
     private final PedidoService pedidoService;
     private final FacturaEmailService facturaEmailService;
+    
 
     public FacturaController(PedidoService pedidoService, FacturaEmailService facturaEmailService) {
         this.pedidoService = pedidoService;
