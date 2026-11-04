@@ -54,4 +54,17 @@ public class CorreoService {
             return false;
         }
     }
+    @jakarta.annotation.PostConstruct
+public void probarSmtp() {
+    log.info("SMTP host={} port={} user={}",
+        System.getenv("MAIL_HOST"),
+        System.getenv("MAIL_PORT"),
+        System.getenv("MAIL_USERNAME"));
+    try (java.net.Socket s = new java.net.Socket()) {
+        s.connect(new java.net.InetSocketAddress("smtp.gmail.com", 587), 10000);
+        log.info("SMTP 587 ALCANZABLE");
+    } catch (Exception e) {
+        log.error("SMTP 587 BLOQUEADO", e);
+    }
+}
 }
