@@ -50,7 +50,7 @@ public class CorreoService {
             log.info("Correo enviado a {}", paraEmail);
             return true;
         } catch (Exception e) {
-            log.error("No se pudo enviar el correo a {}", paraEmail, e);
+            log.error("No se pudo enviar el correo a {}", paraEmail, e.getMessage(), e);
             return false;
         }
     }
