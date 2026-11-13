@@ -71,7 +71,7 @@ public String procesarCompra(Authentication auth, RedirectAttributes ra) {
         // 5. US-04: avisar a cada vendedor (en la app y por correo, en segundo plano)
         notificacionService.notificarVentaAsync(guardado.getId());
         ra.addFlashAttribute("mensaje", "¡Compra realizada con éxito! Esta es tu factura.");
-        return "redirect:/facturas/" + guardado.getId();
+        return "redirect:/factura/" + guardado.getId();
 
     } catch (Exception e) {
         // Esto evitará el error 500 y te mostrará qué pasó en la consola
