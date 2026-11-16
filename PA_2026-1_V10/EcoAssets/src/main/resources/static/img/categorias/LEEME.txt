@@ -1,0 +1,18 @@
+IMAGENES DE LAS CATEGORIAS
+==========================
+Copia aqui una foto por categoria, con estos nombres EXACTOS (todo en minusculas, extension .jpg):
+
+  todos.jpg
+  smartphones.jpg
+  laptops.jpg
+  tablets.jpg
+  consolas.jpg
+  audio.jpg
+  televisores.jpg
+  accesorios.jpg
+  otros.jpg
+
+- Tamano recomendado: 800 x 600 px (proporcion 4:3), menos de 300 KB cada una.
+- Si una imagen no existe, el boton muestra un degradado naranja con su icono.
+- Para usar .png o .webp en lugar de .jpg, cambia la extension en
+  templates/dispositivos/lista.html (busca "categorias/").
