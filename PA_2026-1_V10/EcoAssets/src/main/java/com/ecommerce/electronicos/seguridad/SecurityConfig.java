@@ -38,7 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Público: Ver productos y detalles, registro, y agregamos /login para nuestro login manual
                 .requestMatchers("/", "/dispositivos", "/dispositivos/detalle/**").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/img/**").permitAll()
                 .requestMatchers("/registro", "/login", "/error").permitAll()
                 
                 // Solo Admin: Panel admin y eliminar cualquier usuario
