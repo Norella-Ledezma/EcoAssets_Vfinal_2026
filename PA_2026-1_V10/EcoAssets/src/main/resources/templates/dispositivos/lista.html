@@ -20,28 +20,110 @@
         </div>
     </div>
     
-<!-- Categorías -->
-<div class="container mt-4">
+<!-- ==================== Carrusel de portada ====================
+     Solo se muestra en la portada (sin categoría ni búsqueda). Para mostrarlo siempre, quita el th:if. -->
+<section class="container mt-3" th:if="${categoriaSeleccionada == null and #strings.isEmpty(busqueda)}">
+    <div id="carruselInicio" class="carousel slide hero-carousel shadow-sm" data-bs-ride="carousel" data-bs-interval="6000">
 
-    <!-- Categorías -->
-    <div class="d-flex gap-2 overflow-auto pb-3">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carruselInicio" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Diapositiva 1"></button>
+            <button type="button" data-bs-target="#carruselInicio" data-bs-slide-to="1" aria-label="Diapositiva 2"></button>
+            <button type="button" data-bs-target="#carruselInicio" data-bs-slide-to="2" aria-label="Diapositiva 3"></button>
+        </div>
 
-        <a th:href="@{/dispositivos(busqueda=${busqueda}, marca=${marcaSeleccionada}, precioMin=${precioMinSeleccionado}, precioMax=${precioMaxSeleccionado}, departamento=${departamentoSeleccionado}, municipio=${municipioSeleccionado}, ordenPrecio=${ordenSeleccionado})}" 
-           th:class="${categoriaSeleccionada == null} ? 'btn btn-primary' : 'btn btn-outline-primary'"
-           class="rounded-pill">
-            Todos
-        </a>
+        <div class="carousel-inner">
 
-        <a th:each="cat : ${categorias}" 
-           th:href="@{/dispositivos(categoria=${cat}, marca=${marcaSeleccionada}, precioMin=${precioMinSeleccionado}, precioMax=${precioMaxSeleccionado}, departamento=${departamentoSeleccionado}, municipio=${municipioSeleccionado}, ordenPrecio=${ordenSeleccionado})}"
-           th:class="${categoriaSeleccionada == cat} ? 'btn btn-primary' : 'btn btn-outline-primary'"
-           class="rounded-pill"
-           th:text="${cat}">
-            Categoría
-        </a>
+            <!-- 1) Presentación -->
+            <div class="carousel-item active hero-slide hero-1">
+                <div class="hero-contenido">
+                    <span class="hero-etiqueta">EcoAssets</span>
+                    <h1 class="hero-titulo">Des-usa, Reponga, Re-usa</h1>
+                    <p class="hero-subtitulo">Marketplace de dispositivos eléctricos y electrónicos de segunda mano</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="#categorias" class="btn btn-light btn-lg fw-semibold">Explorar categorías</a>
+                        <a th:href="@{/dispositivos/nuevo}" class="btn btn-outline-light btn-lg">Vender un dispositivo</a>
+                    </div>
+                </div>
+            </div>
 
+            <!-- 2) Vender -->
+            <div class="carousel-item hero-slide hero-2">
+                <div class="hero-contenido">
+                    <span class="hero-etiqueta">Vende</span>
+                    <h2 class="hero-titulo">Dale una segunda vida a tu tecnología</h2>
+                    <p class="hero-subtitulo">Publica lo que ya no usas y deja que otra persona lo aproveche.</p>
+                    <div>
+                        <a th:href="@{/dispositivos/nuevo}" class="btn btn-light btn-lg fw-semibold">Publicar un dispositivo</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3) Impacto ambiental -->
+            <div class="carousel-item hero-slide hero-3">
+                <div class="hero-contenido">
+                    <span class="hero-etiqueta">Cuida el planeta</span>
+                    <h2 class="hero-titulo">Cada equipo reutilizado es un residuo menos</h2>
+                    <p class="hero-subtitulo">Ahorra comprando de segunda mano y reduce la basura electrónica de Cartagena.</p>
+                    <div>
+                        <a href="#productos" class="btn btn-light btn-lg fw-semibold">Ver productos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carruselInicio" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carruselInicio" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+</section>
+
+<!-- ==================== Categorías (botones grandes) ==================== -->
+<div class="container mt-4" id="categorias">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold m-0">Categorías</h4>
+
+        <!-- Botón para desplegar los filtros -->
+        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtrosOffcanvas">
+            <i class="bi bi-funnel"></i> Filtros
+        </button>
     </div>
 
+    <!-- Cada botón usa la imagen static/img/categorias/<nombre>.png (ver LEEME.txt en esa carpeta).
+         Si la imagen no existe se ve el degradado naranja. -->
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+
+        <!-- Todos -->
+        <div class="col">
+            <a th:with="foto=@{/img/categorias/todos.png}"
+               th:href="@{/dispositivos(busqueda=${busqueda}, marca=${marcaSeleccionada}, precioMin=${precioMinSeleccionado}, precioMax=${precioMaxSeleccionado}, departamento=${departamentoSeleccionado}, municipio=${municipioSeleccionado}, ordenPrecio=${ordenSeleccionado})}"
+               class="cat-tile"
+               th:classappend="${categoriaSeleccionada == null} ? ' activa'"
+               th:style="|background-image:url('${foto}'), linear-gradient(135deg,#ffb066,#ff7a00)|">
+                <i class="bi bi-grid cat-icono"></i>
+                <span class="cat-nombre">Todos</span>
+            </a>
+        </div>
+
+        <!-- Una por categoría -->
+        <div class="col" th:each="cat : ${categorias}">
+            <a th:with="foto=@{/img/categorias/{f}.png(f=${#strings.toLowerCase(cat)})}, icono=${cat == 'Smartphones' ? 'bi-phone' : cat == 'Laptops' ? 'bi-laptop' : cat == 'Tablets' ? 'bi-tablet' : cat == 'Consolas' ? 'bi-controller' : cat == 'Audio' ? 'bi-headphones' : cat == 'Televisores' ? 'bi-tv' : cat == 'Accesorios' ? 'bi-plug' : 'bi-box-seam'}"
+               th:href="@{/dispositivos(categoria=${cat}, marca=${marcaSeleccionada}, precioMin=${precioMinSeleccionado}, precioMax=${precioMaxSeleccionado}, departamento=${departamentoSeleccionado}, municipio=${municipioSeleccionado}, ordenPrecio=${ordenSeleccionado})}"
+               class="cat-tile"
+               th:classappend="${categoriaSeleccionada == cat} ? ' activa'"
+               th:style="|background-image:url('${foto}'), linear-gradient(135deg,#ffb066,#ff7a00)|">
+                <i class="bi cat-icono" th:classappend="${icono}"></i>
+                <span class="cat-nombre" th:text="${cat}">Categoría</span>
+            </a>
+        </div>
+
+    </div>
+</div>
     <!-- Botón para desplegar los filtros -->
     <div class="mt-2">
         <button class="btn btn-primary"
