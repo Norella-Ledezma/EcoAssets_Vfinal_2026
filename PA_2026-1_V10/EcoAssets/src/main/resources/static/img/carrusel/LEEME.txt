@@ -1,0 +1,10 @@
+IMAGENES DEL CARRUSEL
+=====================
+Opcional. Si agregas estas fotos, aparecen como fondo de cada diapositiva (el degradado queda como respaldo):
+
+  slide-1.jpg   (presentacion: "Des-usa, Reponga, Re-usa")
+  slide-2.jpg   (publicar un dispositivo)
+  slide-3.jpg   (impacto ambiental)
+
+- Tamano recomendado: 1600 x 600 px, menos de 400 KB cada una.
+- El texto va en blanco con una capa oscura suave, asi que funcionan mejor las fotos medio oscuras o con poco detalle a la izquierda.
